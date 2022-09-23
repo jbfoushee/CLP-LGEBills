@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import os
 import platform
 import matplotlib.pyplot as plt
@@ -8,12 +7,15 @@ import seaborn as sns
 
 def GetKYGasCostData():
 
-    #https://findenergy.com/ky/
-    #https://findenergy.com/ky/natural-gas/
-    #https://www.eia.gov/dnav/ng/hist/n3010ky3m.htm
+    # Data from:
+    #   https://findenergy.com/ky/natural-gas/         (manually transferred)
+    #   https://www.eia.gov/dnav/ng/hist/n3010ky3m.htm (downloaded)
 
     filepath = LocateBillingFile("KYGasPrices.xlsx")
 
+    # ---------------------------------------------------------------------------
+    # Project Requirement: Category 1a: Read more than one data file
+    # --------------------------------------------------------------------------
     df_infile = pd.read_excel(filepath, header=0, skiprows=0, sheet_name="Sheet1")
 
     df_infile.insert(3,"Date_YYYYMM",1)
@@ -25,10 +27,14 @@ def GetKYGasCostData():
 
 def GetKYElecCostData():
 
-    #https://findenergy.com/ky/
+    # Data from:
+    #   https://findenergy.com/ky/ (manually transferred)
 
     filepath = LocateBillingFile("KYElecPrices.xlsx")
 
+    # ---------------------------------------------------------------------------
+    # Project Requirement: Category 1b: Read more than one data file
+    # --------------------------------------------------------------------------
     df_infile = pd.read_excel(filepath, header=0, skiprows=0, sheet_name="Sheet1")
 
     df_infile.insert(3,"Date_YYYYMM",1)
@@ -41,20 +47,25 @@ def GetKYElecCostData():
 def GetBillingData():
     filepath = LocateBillingFile("LGEBills.xlsx")
 
+    # ---------------------------------------------------------------------------
+    # Project Requirement: Category 1c: Read more than one data file
+    # --------------------------------------------------------------------------
     df_infile = pd.read_excel(filepath, header=0, skiprows=0, sheet_name="Bill Data")
 
-    #Remove Excel word-wrapping in column names
+
+    # Remove Excel word-wrapping in column names
     for (columnName, columnData) in df_infile.iteritems():
         mystr = str(columnName)
         if mystr.__contains__("\n"):
             df_infile.rename(columns = {mystr: mystr.replace("\n", "")}, inplace = True)
+
 
     df_infile["Date_YYYYMM"] = df_infile.apply(lambda row: row["Bill Due"].strftime("%Y-%m"), axis = 1)
 
     return df_infile
 
 def LocateBillingFile(what):
-    print ("Looking for data...")
+    print ("Looking for '" + what + "'...")
 
     filepath = os.getcwd() 
     if platform.system() == "Windows":
@@ -75,9 +86,17 @@ def Report1():
 
     df_KYCost_Gas = KYGASDATA
 
-    df_MyCost_Gas = MYBILLING[["Date_YYYYMM", "Gas $", "ccf Used", "$ / ccf", "Avg Temp"]]
+    df_MyCost_Gas = MYBILLING[["Date_YYYYMM", "Gas $", "ccf Used", "Avg Temp"]]
 
+    # ------------------------------------------------------------------------------------------
+    # Project Requirement: Category 2b: ...and perform a pandas merge with your two datasets...
+    # ------------------------------------------------------------------------------------------
     df_merged = pd.merge(df_MyCost_Gas, df_KYCost_Gas, how="left", on="Date_YYYYMM", suffixes=('_me', '_KY'))
+
+    # -----------------------------------------------------------------------------------------------
+    # Project Requirement: Category 2c: ...then calculate some new values based on the new dataset
+    # -----------------------------------------------------------------------------------------------
+    df_merged["Difference"] = df_merged["Gas $"] - df_merged["Average Bill per month"]
 
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Gas $"])
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Average Bill per month"])
@@ -88,7 +107,7 @@ def Report2():
 
     df_KYCost_Elec = KYELECDATA
     
-    df_MyCost_Elec = MYBILLING[["Date_YYYYMM", "Electric $", "kwh Used", "$ / kwh", "Avg Temp"]]
+    df_MyCost_Elec = MYBILLING[["Date_YYYYMM", "Electric $", "kwh Used", "Avg Temp"]]
 
     df_merged = pd.merge(df_MyCost_Elec, df_KYCost_Elec, how="left", on="Date_YYYYMM", suffixes=('_me', '_KY'))
 
@@ -135,7 +154,7 @@ def main():
         elif option == 4:
             Report4()            
         elif option == 0:
-            print('Thanks message before exiting')
+            print('Quitting...')
             exit()
         else:
             print('Invalid option. Please enter a number between 0 and ' + str(max(menu_options.keys())) + '.')
