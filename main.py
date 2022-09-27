@@ -11,7 +11,7 @@ def GetKYGasCostData():
     #   https://findenergy.com/ky/natural-gas/         (manually transferred)
     #   https://www.eia.gov/dnav/ng/hist/n3010ky3m.htm (downloaded)
 
-    filepath = LocateBillingFile("KYGasPrices.xlsx")
+    filepath = GetFile("KYGasPrices.xlsx")
 
     # ---------------------------------------------------------------------------
     # Project Requirement: Category 1a: Read more than one data file
@@ -30,7 +30,7 @@ def GetKYElecCostData():
     # Data from:
     #   https://findenergy.com/ky/ (manually transferred)
 
-    filepath = LocateBillingFile("KYElecPrices.xlsx")
+    filepath = GetFile("KYElecPrices.xlsx")
 
     # ---------------------------------------------------------------------------
     # Project Requirement: Category 1b: Read more than one data file
@@ -45,7 +45,7 @@ def GetKYElecCostData():
     return df_infile
 
 def GetBillingData():
-    filepath = LocateBillingFile("LGEBills.xlsx")
+    filepath = GetFile("LGEBills.xlsx")
 
     # ---------------------------------------------------------------------------
     # Project Requirement: Category 1c: Read more than one data file
@@ -64,18 +64,25 @@ def GetBillingData():
 
     return df_infile
 
-def LocateBillingFile(what):
-    print ("Looking for '" + what + "'...")
+def GetFile(what: str):
+    print ("Looking for file '" + what + "'...")
 
+    seperator = ""
     filepath = os.getcwd() 
     if platform.system() == "Windows":
-        filepath += "\\"
+        seperator = "\\"
     else:
-        filepath += "/"
-    filepath += what
+        seperator = "/"
+    filepath += seperator + what
 
     while os.path.exists(filepath) == False:
-        filepath = input("Input file not found. Where is it?\n")
+        filepath = input("Input file not found @ '" + filepath + "'. Where is it?\n")
+
+        # User could enter "P:\ath", "P:\ath\", or "P:\ath\file.ext"
+        # Normalize all three to "P:\ath\file.ext"
+        if (filepath[::-1][0: len(what) + 1] != what[::-1] + seperator):
+            filepath = (filepath + seperator + what).replace(seperator + seperator, seperator)
+
     return filepath
 
 KYGASDATA = GetKYGasCostData()
@@ -116,47 +123,96 @@ def Report2():
     plt.legend(['My Electric Bill', 'Avg KY Electric Bill'])
     plt.show()
 
+    sns.regplot(x="Date_YYYYMM", y="Electric $", data=df_merged).set(title="My Avg electric bill vs KY Avg electric bill")
+    sns.regplot(x="Date_YYYYMM", y="Average Bill per month", data=df_merged).set(title="My Avg electric bill vs KY Avg electric bill")
+    plt.show()
+
 def Report3():
 
     df_MyCost_Gas = MYBILLING[["Date_YYYYMM", "Gas $", "ccf Used", "Avg ccf/d", "Avg Temp"]]
 
-    sns.regplot(x="Avg Temp", y="Avg ccf/d", order=2, data=df_MyCost_Gas).set(title="Avg gas usage per day vs Avg monthly temperature")
+    sns.regplot(x="Avg Monthly Temp", y="Avg ccf/d", order=2, data=df_MyCost_Gas).set(title="My Avg gas usage per day vs Avg monthly temperature")
     plt.show()
 
 def Report4():
 
     df_MyCost_Elec = MYBILLING[["Date_YYYYMM", "Electric $", "kwh Used", "Avg kwh/d", "Avg Temp"]]
 
-    sns.regplot(x="Avg Temp", y="Avg kwh/d", order=2, data=df_MyCost_Elec).set(title="Avg electric usage per day vs Avg monthly temperature")
+    sns.regplot(x="Avg Monthly Temp", y="Avg kwh/d", order=2, data=df_MyCost_Elec).set(title="My Avg electric usage per day vs Avg monthly temperature")
     plt.show()
+
+def Report5():
+
+    df_MyCost = MYBILLING[["Date_YYYYMM", "Total $", "Avg Temp"]]
+
+    sns.regplot(x="Avg Monthly Temp", y="Total Bill in $", order=2, data=df_MyCost).set(title="My Avg monthtly bill vs Avg monthly temperature")
+    plt.show()
+
+def Report6():
+
+    df_MyCost = MYBILLING[["Month", "Total $", "Electric $", "Gas $"]]
+    df_MyCost["ElecOfBill"] = df_MyCost["Electric $"] / df_MyCost["Total $"] * 100
+    df_MyCost["GasOfBill"] = df_MyCost["Gas $"] / df_MyCost["Total $"] * 100
+
+    df_MyCost.groupby(['Month']).mean()
+
+    plt.bar(df_MyCost["Month"], df_MyCost["ElecOfBill"] + df_MyCost["GasOfBill"], label='Electric')
+    plt.bar(df_MyCost["Month"], df_MyCost["GasOfBill"], label='Gas') 
+   
+
+    plt.xlabel('Month of year')
+    plt.ylabel('Percentage of Total Bill')
+    plt.title('Percentage of my bill between gas and electric')
+    plt.legend(loc='upper left')
+
+    plt.show()
+    
 
 def main():
     menu_options = {
         1: "Report 1",
         2: "Report 2",
-        3: "Report 3",
-        4: "Report 4",
+        3: "Report 3: My Avg gas usage per day vs Avg monthly temperature",
+        4: "Report 4: My Avg electric usage per day vs Avg monthly temperature",
+        5: "Report 5: My Avg monthtly bill vs Avg monthly temperature",
+        6: "Report 6: Percentage of my bill between gas and electric",
         0: "Quit",
     }
     for key in menu_options.keys():
         print (key, '--', menu_options[key] )
 
     while (True):
-        option = int(input('Enter your choice: '))
-                
-        #Check what choice was entered and act accordingly
-        if option == 1:
-            Report1()
-        elif option == 2:
-            Report2()
-        elif option == 3:
-            Report3()
-        elif option == 4:
-            Report4()            
-        elif option == 0:
-            print('Quitting...')
-            exit()
-        else:
-            print('Invalid option. Please enter a number between 0 and ' + str(max(menu_options.keys())) + '.')
+        option = input('Enter your choice: ')
+        
+        badchoice = 1
 
+        if (option.isnumeric() == True):
+            option = int(option)
+            badchoice = 0
+
+            print(option)
+
+            #Check what choice was entered and act accordingly
+            if option == 1:
+                Report1()
+            elif option == 2:
+                Report2()
+            elif option == 3:
+                Report3()
+            elif option == 4:
+                Report4()
+            elif option == 5:
+                Report5()                            
+            elif option == 6:
+                Report6()             
+            elif option == 0:
+                print('Quitting...')
+                exit()
+            else:
+                badchoice = 1
+        else:
+            badchoice = 1
+
+        if (badchoice == 1):
+            print('Invalid option. Please enter a number between 0 and ' + str(max(menu_options.keys())) + '.')
 main()
