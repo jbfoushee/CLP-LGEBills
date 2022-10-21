@@ -3,6 +3,7 @@ import os
 import platform
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 
 def GetKYGasCostData():
@@ -29,6 +30,7 @@ def GetKYElecCostData():
 
     # Data from:
     #   https://findenergy.com/ky/ (manually transferred)
+    #   https://findenergy.com/_elderjs/props/ejs-835468241.json
 
     filepath = GetFile("KYElecPrices.xlsx")
 
@@ -53,12 +55,14 @@ def GetBillingData():
     df_infile = pd.read_excel(filepath, header=0, skiprows=0, sheet_name="Bill Data")
 
 
-    # Remove Excel word-wrapping in column names
+    # Cleaning data: Remove Excel word-wrapping in column names
     for (columnName, columnData) in df_infile.iteritems():
         mystr = str(columnName)
         if mystr.__contains__("\n"):
             df_infile.rename(columns = {mystr: mystr.replace("\n", "")}, inplace = True)
 
+    # Cleaning data: Remove rows with at least column value with an NaN value
+    df_infile.dropna(axis=0, inplace=True)
 
     df_infile["Date_YYYYMM"] = df_infile.apply(lambda row: row["Bill Due"].strftime("%Y-%m"), axis = 1)
 
@@ -108,6 +112,10 @@ def Report1():
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Gas $"])
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Average Bill per month"])
     plt.legend(['My Gas Bill','Avg KY Gas Bill'])
+    plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 12))
+    fmt = '${x:,.0f}'
+    tick = tick.StrMethodFormatter(fmt)
+    plt.yaxis.set_major_formatter(tick) 
     plt.show()
 
 def Report2():
@@ -121,10 +129,7 @@ def Report2():
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Electric $"])
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Average Bill per month"])
     plt.legend(['My Electric Bill', 'Avg KY Electric Bill'])
-    plt.show()
-
-    sns.regplot(x="Date_YYYYMM", y="Electric $", data=df_merged).set(title="My Avg electric bill vs KY Avg electric bill")
-    sns.regplot(x="Date_YYYYMM", y="Average Bill per month", data=df_merged).set(title="My Avg electric bill vs KY Avg electric bill")
+    plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 12))
     plt.show()
 
 def Report3():
@@ -170,11 +175,11 @@ def Report6():
 
 def main():
     menu_options = {
-        1: "Report 1",
-        2: "Report 2",
+        1: "Report 1: My Gas bill vs the Avg KY Gas bill",
+        2: "Report 2: My Electric bill vs the Avg KY Electric bill",
         3: "Report 3: My Avg gas usage per day vs Avg monthly temperature",
         4: "Report 4: My Avg electric usage per day vs Avg monthly temperature",
-        5: "Report 5: My Avg monthtly bill vs Avg monthly temperature",
+        5: "Report 5: My Avg monthly bill vs Avg monthly temperature",
         6: "Report 6: Percentage of my bill between gas and electric",
         0: "Quit",
     }
