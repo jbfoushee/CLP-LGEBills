@@ -99,6 +99,8 @@ Report 5: My Avg monthly bill vs Avg monthly temperature
 
 Report 6: Avg distribution of my bill between gas and electric, by month
 
+See main.py for areas labeled "Category 3" in comments.
+
 ### Category 4: Best Practices
 
 The program should utilize a virtual environment and document library dependencies in a requirements.txt file.

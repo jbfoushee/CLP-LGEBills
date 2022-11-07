@@ -1,10 +1,11 @@
-import pandas as pd
-import os
-import platform
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import seaborn as sns
 import numpy as np
+import os
+import pandas as pd
+import platform
+import seaborn as sns
+
 
 def GetKYGasCostData():
 
@@ -61,11 +62,12 @@ def GetBillingData():
             df_infile.rename(columns = {mystr: mystr.replace("\n", "")}, inplace = True)
 
     # -------------------------------------------------------------------------------------------------------------
-    # Project Requirement: Category 2a: Cleaning data, Remove rows with at least column value with an NaN value...
-    # ------------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 2a: Cleaning data -> Remove rows with at least column value with an NaN value...
+    # -------------------------------------------------------------------------------------------------------------
+    # Remove rows where the primary key ("Bill Due") or the pricing totals are missing
     df_infile.dropna(axis=0, subset=['Bill Due','Total $','Electric $','Gas $'], inplace=True)
 
-    # Build an inner-join formatted value
+    # Build an inner-join-friendly formatted value
     df_infile["Date_YYYYMM"] = df_infile.apply(lambda row: row["Bill Due"].strftime("%Y-%m"), axis = 1)
 
 
@@ -118,6 +120,10 @@ def Report1():
     plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 12))
     formatx = ticker.StrMethodFormatter('${x:,.0f}')
     plt.gca().yaxis.set_major_formatter(formatx) 
+
+    # ----------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 3a: Visualize data in a graph, chart, or other visual representation of data.
+    # ----------------------------------------------------------------------------------------------------------
     plt.show()
 
 def Report2():
@@ -126,6 +132,9 @@ def Report2():
     
     df_MyCost_Elec = MYBILLING[["Date_YYYYMM", "Electric $", "kwh Used", "Avg Temp"]]
 
+    # ------------------------------------------------------------------------------------------
+    # Project Requirement: Category 2b: ...and perform a pandas merge with your two datasets...
+    # ------------------------------------------------------------------------------------------
     df_merged = pd.merge(df_MyCost_Elec, df_KYCost_Elec, how="left", on="Date_YYYYMM", suffixes=('_me', '_KY'))
 
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Electric $"])
@@ -134,6 +143,10 @@ def Report2():
     plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 12))
     formaty = ticker.StrMethodFormatter('${x:,.0f}')
     plt.gca().yaxis.set_major_formatter(formaty) 
+
+    # ----------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 3b: Visualize data in a graph, chart, or other visual representation of data.
+    # ----------------------------------------------------------------------------------------------------------
     plt.show()
 
 def Report3():
@@ -143,6 +156,10 @@ def Report3():
     sns.regplot(x="Avg Temp", y="Avg ccf/d", order=2, data=df_MyCost_Gas).set(title="My Avg gas usage per day vs Avg monthly temperature")
     formatx = ticker.StrMethodFormatter('{x:,.0f}°')
     plt.gca().xaxis.set_major_formatter(formatx) 
+    
+    # ----------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 3c: Visualize data in a graph, chart, or other visual representation of data.
+    # ----------------------------------------------------------------------------------------------------------
     plt.show()
 
 def Report4():
@@ -152,6 +169,10 @@ def Report4():
     sns.regplot(x="Avg Temp", y="Avg kwh/d", order=2, data=df_MyCost_Elec).set(title="My Avg electric usage per day vs Avg monthly temperature")
     formatx = ticker.StrMethodFormatter('{x:,.0f}°')
     plt.gca().xaxis.set_major_formatter(formatx) 
+    
+    # ----------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 3d: Visualize data in a graph, chart, or other visual representation of data.
+    # ----------------------------------------------------------------------------------------------------------
     plt.show()
 
 def Report5():
@@ -163,11 +184,18 @@ def Report5():
     plt.gca().xaxis.set_major_formatter(formatx) 
     formaty = ticker.StrMethodFormatter('${x:,.0f}')
     plt.gca().yaxis.set_major_formatter(formaty)     
+    
+    # ----------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 3e: Visualize data in a graph, chart, or other visual representation of data.
+    # ----------------------------------------------------------------------------------------------------------
     plt.show()
 
 def Report6():
 
-    df_MyCost = MYBILLING[["Month", "Total $", "Electric $", "Gas $"]]
+    # Make a copy() to avoid SettingWithCopyWarning
+    df_MyCost = MYBILLING[["Month", "Total $", "Electric $", "Gas $"]].copy()
+
+    #Build new columns representing percentages of the facet to the overall price
     df_MyCost["ElecOfBill"] = df_MyCost["Electric $"] / df_MyCost["Total $"] * 100
     df_MyCost["GasOfBill"] = df_MyCost["Gas $"] / df_MyCost["Total $"] * 100
 
@@ -187,6 +215,9 @@ def Report6():
     plt.gca().yaxis.set_major_formatter(formaty)         
     plt.legend(loc='upper left')
 
+    # ----------------------------------------------------------------------------------------------------------
+    # Project Requirement: Category 3f: Visualize data in a graph, chart, or other visual representation of data.
+    # ----------------------------------------------------------------------------------------------------------
     plt.show()
     
 
@@ -214,7 +245,8 @@ def main():
             option = int(option)
             badchoice = 0
 
-            print(option)
+            if (option > 0) & (option <= max(menu_options.keys())):
+                print("Close the report to return to menu...")
 
             #Check what choice was entered and act accordingly
             if option == 1:
