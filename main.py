@@ -120,7 +120,8 @@ def Report1():
     plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 6))
     plt.xticks(rotation=90)
     formatx = ticker.StrMethodFormatter('${x:,.0f}')
-    plt.gca().yaxis.set_major_formatter(formatx) 
+    plt.gca().yaxis.set_major_formatter(formatx)
+    plt.title('My Gas bill vs the Avg KY Gas bill')
 
     # ----------------------------------------------------------------------------------------------------------
     # Project Requirement: Category 3a: Visualize data in a graph, chart, or other visual representation of data.
@@ -144,7 +145,8 @@ def Report2():
     plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 6))
     plt.xticks(rotation=90)
     formaty = ticker.StrMethodFormatter('${x:,.0f}')
-    plt.gca().yaxis.set_major_formatter(formaty) 
+    plt.gca().yaxis.set_major_formatter(formaty)
+    plt.title('My Electric bill vs the Avg KY Electric bill')
 
     # ----------------------------------------------------------------------------------------------------------
     # Project Requirement: Category 3b: Visualize data in a graph, chart, or other visual representation of data.

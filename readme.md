@@ -110,10 +110,8 @@ Report 2: My Electric bill vs the Avg KY Electric bill
 Report 3: My Avg gas usage per day vs Avg monthly temperature
 
 Report 4: My Avg electric usage per day vs Avg monthly temperature  
-(Note: Report does not distinguish between Kentucky households that use electricity or gas as primary heating)
 
 Report 5: My Avg monthly bill vs Avg monthly temperature  
-(Note: Report does not distinguish between Kentucky households that use electricity or gas as primary heating)
 
 Report 6: Avg distribution of my bill between gas and electric, by month
 
