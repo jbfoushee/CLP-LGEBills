@@ -38,6 +38,8 @@ Data is pulled from
 |-----------------------------------------------------------|
 | pip install -r requirements.txt                           |
 ```
+Watch for any errors. Re-run if necessary.
+
 5. Execute main.py
 ```
 | Linux/Mac                | Windows                        |
@@ -52,8 +54,24 @@ In the terminal, run
 |--------------------------|--------------------------------|
 | python3 main.py          | python main.py                 |
 ```
-The program will load the data files, and prompt which report you would like to display.
+The program will load the data files, and prompt which report you would like to display.  
 Close the report, and either view another or exit the program.
+
+## Uninstall:
+
+1. Uninstall requirements defined by requirements.txt :
+```
+| Linux/Mac/Windows                                         |
+|-----------------------------------------------------------|
+| pip uinstall -r requirements.txt -y                       |
+```
+
+2. Deactivate the virtual environment :
+```
+| Linux/Mac/Windows                                         |
+|--------------------------|--------------------------------|
+| deactivate                                                |
+```
 
 
 ## Project Requirements
@@ -63,16 +81,16 @@ Read 2+ data files (JSON, CSV, Excel, etc.)
 
 The LGE bills were manually transferred into an Excel document.
 
-The Kentucky gas- and electric cost data were found within charts found at [findenergy.com](https://findenergy.com/ky/).
-Research was taken to locate the underlying .json through internet developer tools, but the source filename randomizes.
-I could not take the chance the project reviewer would receive an error attempting to locate the file.
+The Kentucky gas- and electric cost data were found within charts found at [findenergy.com](https://findenergy.com/ky/).  
+Research was taken to locate the underlying .json through internet developer tools, but the source filename randomizes.  
+I could not take the chance the project reviewer would receive an error attempting to locate the file.  
 The data were transferred manually into Excel documents.
 
 See main.py for areas labeled "Category 1" in comments.
 
 ### Category 2: Clean and operate on data:
 
-Clean your data and perform a pandas merge with your two data sets, then calculate some new values based on the new data set.
+Clean your data and perform a pandas merge with your two data sets, then calculate some new values based on the new data set.  
 This was accomplished by removing NaN values on the joining values between the data sets.
 
 See main.py for areas labeled "Category 2" in comments.
@@ -85,16 +103,16 @@ The Python script, once fully loaded, allows the user to review 6 reports out of
 
 Report 1: My Gas bill vs the Avg KY Gas bill
 
-Report 2: My Electric bill vs the Avg KY Electric bill
-(Note: Report does not distinguish between Kentucky households that use electricity or gas as primary heating)
+Report 2: My Electric bill vs the Avg KY Electric bill  
+(Note: Report does not distinguish between Kentucky households that use electricity or gas as primary heating)  
 (Note: Data on Average KY cost goes back to 2017.)
 
 Report 3: My Avg gas usage per day vs Avg monthly temperature
 
-Report 4: My Avg electric usage per day vs Avg monthly temperature
+Report 4: My Avg electric usage per day vs Avg monthly temperature  
 (Note: Report does not distinguish between Kentucky households that use electricity or gas as primary heating)
 
-Report 5: My Avg monthly bill vs Avg monthly temperature
+Report 5: My Avg monthly bill vs Avg monthly temperature  
 (Note: Report does not distinguish between Kentucky households that use electricity or gas as primary heating)
 
 Report 6: Avg distribution of my bill between gas and electric, by month
@@ -103,5 +121,5 @@ See main.py for areas labeled "Category 3" in comments.
 
 ### Category 4: Best Practices
 
-The program should utilize a virtual environment and document library dependencies in a requirements.txt file.
+The program should utilize a virtual environment and document library dependencies in a requirements.txt file.  
 See readme for requirements.txt

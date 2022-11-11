@@ -117,7 +117,8 @@ def Report1():
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Gas $"])
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Average Bill per month"])
     plt.legend(['My Gas Bill','Avg KY Gas Bill'])
-    plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 12))
+    plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 6))
+    plt.xticks(rotation=90)
     formatx = ticker.StrMethodFormatter('${x:,.0f}')
     plt.gca().yaxis.set_major_formatter(formatx) 
 
@@ -140,7 +141,8 @@ def Report2():
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Electric $"])
     plt.plot(df_merged["Date_YYYYMM"], df_merged["Average Bill per month"])
     plt.legend(['My Electric Bill', 'Avg KY Electric Bill'])
-    plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 12))
+    plt.xticks(np.arange(0, len(df_merged["Date_YYYYMM"])+1, 6))
+    plt.xticks(rotation=90)
     formaty = ticker.StrMethodFormatter('${x:,.0f}')
     plt.gca().yaxis.set_major_formatter(formaty) 
 
